@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulador de Projeção de Ganhos - Empreendimento Vergê</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .metric {
+            margin-bottom: 15px;
+        }
+        .metric-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 18px;
+            color: #2c3e50;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #eee;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+        }
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 4px 4px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .chart-container {
+            margin-top: 30px;
+            height: 400px;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        .print-button {
+            background-color: #27ae60;
+        }
+        .print-button:hover {
+            background-color: #219653;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            .container {
+                width: 100%;
+                max-width: 100%;
+            }
+            .results {
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            .tab-content {
+                display: block !important;
+                border: none;
+                padding: 0;
+                margin-bottom: 30px;
+            }
+            .chart-container {
+                page-break-inside: avoid;
+                height: 300px;
+            }
+        }
+        .print-only {
+            display: none;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Simulador de Projeção de Ganhos - Empreendimento Vergê</h1>
+        
+        <div class="form-group no-print">
+            <label for="unidade">Selecione a unidade:</label>
+            <select id="unidade">
+                <option value="201-B1">201 - B1 (3DS, 104,51 m², Sul)</option>
+                <option value="202-B1">202 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="204-B1">204 - B1 (2DS, 73,11 m², Oeste)</option>
+                <option value="205-B1">205 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="206-B1">206 - B1 (3DS, 104,51 m², Norte)</option>
+                <option value="209-B1">209 - B1 (1D, 41,40 m², Leste)</option>
+                <option value="210-B1">210 - B1 (1D, 40,54 m², Leste)</option>
+                <option value="211-B1">211 - B1 (2DS, 72,68 m², Leste)</option>
+                <option value="301-B1">301 - B1 (3DS, 104,51 m², Sul)</option>
+                <option value="302-B1">302 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="304-B1">304 - B1 (2DS, 73,11 m², Oeste)</option>
+                <option value="305-B1">305 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="306-B1">306 - B1 (3DS, 104,51 m², Norte)</option>
+                <option value="309-B1">309 - B1 (1D, 41,40 m², Leste)</option>
+                <option value="310-B1">310 - B1 (1D, 40,54 m², Leste)</option>
+                <option value="311-B1">311 - B1 (2DS, 72,68 m², Leste)</option>
+                <option value="401-B1">401 - B1 (3DS, 104,51 m², Sul)</option>
+                <option value="402-B1">402 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="404-B1">404 - B1 (2DS, 73,11 m², Oeste)</option>
+                <option value="405-B1">405 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="406-B1">406 - B1 (3DS, 104,51 m², Norte)</option>
+                <option value="409-B1">409 - B1 (1D, 41,40 m², Leste)</option>
+                <option value="410-B1">410 - B1 (1D, 40,54 m², Leste)</option>
+                <option value="411-B1">411 - B1 (2DS, 72,68 m², Leste)</option>
+                <option value="501-B1">501 - B1 (3DS, 104,51 m², Sul)</option>
+                <option value="502-B1">502 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="504-B1">504 - B1 (2DS, 73,11 m², Oeste)</option>
+                <option value="505-B1">505 - B1 (2DS, 73,78 m², Oeste)</option>
+                <option value="506-B1">506 - B1 (3DS, 104,51 m², Norte)</option>
+                <option value="509-B1">509 - B1 (1D, 41,40 m², Leste)</option>
+                <option value="510-B1">510 - B1 (1D, 40,54 m², Leste)</option>
+                <option value="511-B1">511 - B1 (2DS, 72,68 m², Leste)</option>
+                <option value="601-B1">601 - B1 (3DS, 104,51 m², Sul - Cobertura)</option>
+                <option value="602-B1">602 - B1 (2DS, 100,71 m², Oeste - Cobertura)</option>
+                <option value="603-B1">603 - B1 (2DS, 120,85 m², Oeste - Cobertura)</option>
+                <option value="604-B1">604 - B1 (2DS, 73,11 m², Oeste - Cobertura)</option>
+                <option value="605-B1">605 - B1 (2DS, 73,78 m², Oeste - Cobertura)</option>
+                <option value="606-B1">606 - B1 (3DS, 104,77 m², Norte - Cobertura)</option>
+            </select>
+        </div>
+        
+        <div class="form-group no-print">
+            <label for="anos">Anos de investimento:</label>
+            <input type="range" id="anos" min="1" max="10" value="5" oninput="updateAnosValue(this.value)">
+            <span id="anos-value">5 anos</span>
+        </div>
+        
+        <div class="form-group no-print">
+            <label for="cenario-valorizacao">Cenário de valorização:</label>
+            <select id="cenario-valorizacao">
+                <option value="pessimista">Pessimista (7% ao ano)</option>
+                <option value="medio" selected>Médio (10% ao ano)</option>
+                <option value="otimista">Otimista (15% ao ano)</option>
+            </select>
+        </div>
+        
+        <div class="form-group no-print">
+            <label for="cenario-ocupacao">Cenário de ocupação (Airbnb):</label>
+            <select id="cenario-ocupacao">
+                <option value="pessimista">Pessimista (64% alta / 32% baixa)</option>
+                <option value="medio" selected>Médio (80% alta / 40% baixa)</option>
+                <option value="otimista">Otimista (95% alta / 48% baixa)</option>
+            </select>
+        </div>
+        
+        <div class="button-group no-print">
+            <button onclick="simular()">Simular</button>
+            <button class="print-button" onclick="gerarRelatorio()" id="btn-relatorio" style="display: none;">Baixar Relatório</button>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <div class="print-only">
+                <h2>Relatório de Simulação - Empreendimento Vergê</h2>
+                <p><strong>Unidade:</strong> <span id="print-unidade"></span></p>
+                <p><strong>Cenário de valorização:</strong> <span id="print-cenario-valorizacao"></span></p>
+                <p><strong>Cenário de ocupação (Airbnb):</strong> <span id="print-cenario-ocupacao"></span></p>
+                <p><strong>Anos de investimento:</strong> <span id="print-anos"></span></p>
+            </div>
+            
+            <h2 class="no-print">Resultados da Simulação</h2>
+            
+            <div class="tabs no-print">
+                <div class="tab active" onclick="openTab(event, 'comparativo')">Comparativo</div>
+                <div class="tab" onclick="openTab(event, 'revenda')">Revenda</div>
+                <div class="tab" onclick="openTab(event, 'airbnb')">Airbnb</div>
+            </div>
+            
+            <div id="comparativo" class="tab-content active">
+                <h3>Análise Comparativa</h3>
+                
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Revenda</h4>
+                        <div class="metric">
+                            <div class="metric-title">Valor Futuro</div>
+                            <div class="metric-value" id="revenda-valor-futuro">R$ 0,00</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Lucro Bruto</div>
+                            <div class="metric-value" id="revenda-lucro-bruto">R$ 0,00</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">ROI Total</div>
+                            <div class="metric-value" id="revenda-roi-total">0,00%</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">ROI Anual</div>
+                            <div class="metric-value" id="revenda-roi-anual">0,00% ao ano</div>
+                        </div>
+                    </div>
+                    
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Airbnb</h4>
+                        <div class="metric">
+                            <div class="metric-title">Receita Anual</div>
+                            <div class="metric-value" id="airbnb-receita-anual">R$ 0,00</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Lucro Operacional Anual</div>
+                            <div class="metric-value" id="airbnb-lucro-operacional">R$ 0,00</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">ROI Operacional Anual</div>
+                            <div class="metric-value" id="airbnb-roi-operacional">0,00% ao ano</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-title">Payback</div>
+                            <div class="metric-value" id="airbnb-payback">0,0 anos</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="roi-chart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="lucro-chart"></canvas>
+                </div>
+                
+                <h4>Tabela Comparativa</h4>
+                <table>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Revenda</th>
+                        <th>Airbnb</th>
+                    </tr>
+                    <tr>
+                        <td>Valor Total do Imóvel</td>
+                        <td id="comp-valor-total-revenda">R$ 0,00</td>
+                        <td id="comp-valor-total-airbnb">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Valor Futuro (após valorização)</td>
+                        <td id="comp-valor-futuro-revenda">R$ 0,00</td>
+                        <td id="comp-valor-futuro-airbnb">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Investimento Total</td>
+                        <td id="comp-investimento-revenda">R$ 0,00</td>
+                        <td id="comp-investimento-airbnb">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>Lucro Total (5 anos)</td>
+                        <td id="comp-lucro-revenda">R$ 0,00</td>
+                        <td id="comp-lucro-airbnb">R$ 0,00</td>
+                    </tr>
+                    <tr>
+                        <td>ROI Total</td>
+                        <td id="comp-roi-total-revenda">0,00%</td>
+                        <td id="comp-roi-total-airbnb">0,00%</td>
+                    </tr>
+                    <tr>
+                        <td>ROI Anual</td>
+                        <td id="comp-roi-anual-revenda">0,00%</td>
+                        <td id="comp-roi-anual-airbnb">0,00%</td>
+                    </tr>
+                    <tr>
+                        <td>Payback (anos)</td>
+                        <td>N/A</td>
+                        <td id="comp-payback-airbnb">0,0</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div id="revenda" class="tab-content">
+                <h3>Detalhes da Simulação de Revenda</h3>
+                
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Parâmetros da Simulação</h4>
+                        <p><strong>Unidade:</strong> <span id="revenda-unidade">-</span></p>
+                        <p><strong>Cenário de valorização:</strong> <span id="revenda-cenario">-</span></p>
+                        <p><strong>Taxa de valorização anual:</strong> <span id="revenda-taxa-valorizacao">0,00%</span></p>
+                        <p><strong>Anos de investimento:</strong> <span id="revenda-anos">0</span></p>
+                    </div>
+                    
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Valores de Aquisição</h4>
+                        <p><strong>Valor total:</strong> <span id="revenda-valor-total">R$ 0,00</span></p>
+                        <p><strong>Valor por m²:</strong> <span id="revenda-valor-m2">R$ 0,00</span></p>
+                        <p><strong>Valor de entrada:</strong> <span id="revenda-entrada">R$ 0,00</span></p>
+                        <p><strong>Parcelas mensais (42x):</strong> <span id="revenda-parcela-mensal">R$ 0,00</span></p>
+                        <p><strong>Parcelas semestrais (7x):</strong> <span id="revenda-parcela-semestral">R$ 0,00</span></p>
+                        <p><strong>Financiamento bancário:</strong> <span id="revenda-financiamento">R$ 0,00</span></p>
+                    </div>
+                </div>
+                
+                <h4>Resultados</h4>
+                <p><strong>Valor futuro:</strong> <span id="revenda-detalhe-valor-futuro">R$ 0,00</span></p>
+                <p><strong>Investimento total:</strong> <span id="revenda-investimento-total">R$ 0,00</span></p>
+                <p><strong>Lucro bruto:</strong> <span id="revenda-detalhe-lucro-bruto">R$ 0,00</span></p>
+                <p><strong>ROI:</strong> <span id="revenda-detalhe-roi-total">0,00%</span></p>
+                <p><strong>ROI anual:</strong> <span id="revenda-detalhe-roi-anual">0,00%</span></p>
+                
+                <h4>Fluxo de Caixa</h4>
+                <div class="chart-container">
+                    <canvas id="revenda-fluxo-chart"></canvas>
+                </div>
+            </div>
+            
+            <div id="airbnb" class="tab-content">
+                <h3>Detalhes da Simulação de Airbnb</h3>
+                
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Parâmetros da Simulação</h4>
+                        <p><strong>Unidade:</strong> <span id="airbnb-unidade">-</span></p>
+                        <p><strong>Cenário de valorização:</strong> <span id="airbnb-cenario-valorizacao">-</span></p>
+                        <p><strong>Taxa de valorização anual:</strong> <span id="airbnb-taxa-valorizacao">0,00%</span></p>
+                        <p><strong>Cenário de ocupação:</strong> <span id="airbnb-cenario-ocupacao">-</span></p>
+                        <p><strong>Taxa de ocupação (alta temporada):</strong> <span id="airbnb-taxa-ocupacao-alta">0,00%</span></p>
+                        <p><strong>Taxa de ocupação (baixa temporada):</strong> <span id="airbnb-taxa-ocupacao-baixa">0,00%</span></p>
+                        <p><strong>Anos de investimento:</strong> <span id="airbnb-anos">0</span></p>
+                    </div>
+                    
+                    <div style="width: 48%; min-width: 300px;">
+                        <h4>Valores de Aquisição</h4>
+                        <p><strong>Valor total:</strong> <span id="airbnb-valor-total">R$ 0,00</span></p>
+                        <p><strong>Valor por m²:</strong> <span id="airbnb-valor-m2">R$ 0,00</span></p>
+                        <p><strong>Valor de entrada:</strong> <span id="airbnb-entrada">R$ 0,00</span></p>
+                        <p><strong>Parcelas mensais (42x):</strong> <span id="airbnb-parcela-mensal">R$ 0,00</span></p>
+                        <p><strong>Parcelas semestrais (7x):</strong> <span id="airbnb-parcela-semestral">R$ 0,00</span></p>
+                        <p><strong>Financiamento bancário:</strong> <span id="airbnb-financiamento">R$ 0,00</span></p>
+                    </div>
+                </div>
+                
+                <h4>Resultados Operacionais</h4>
+                <p><strong>Diária média:</strong> <span id="airbnb-diaria-media">R$ 0,00</span></p>
+                <p><strong>Receita anual:</strong> <span id="airbnb-detalhe-receita-anual">R$ 0,00</span></p>
+                <p><strong>Custos operacionais:</strong> <span id="airbnb-custos-operacionais">R$ 0,00</span></p>
+                <p><strong>Lucro operacional anual:</strong> <span id="airbnb-detalhe-lucro-operacional">R$ 0,00</span></p>
+                <p><strong>Valor futuro do imóvel:</strong> <span id="airbnb-detalhe-valor-futuro">R$ 0,00</span></p>
+                
+                <h4>Resultados Financeiros</h4>
+                <p><strong>Investimento total:</strong> <span id="airbnb-investimento-total">R$ 0,00</span></p>
+                <p><strong>Lucro operacional total (5 anos):</strong> <span id="airbnb-lucro-operacional-total">R$ 0,00</span></p>
+                <p><strong>ROI operacional:</strong> <span id="airbnb-detalhe-roi-operacional">0,00%</span></p>
+                <p><strong>ROI operacional anual:</strong> <span id="airbnb-detalhe-roi-operacional-anual">0,00%</span></p>
+                <p><strong>ROI total (com valorização):</strong> <span id="airbnb-detalhe-roi-total">0,00%</span></p>
+                <p><strong>ROI total anual:</strong> <span id="airbnb-detalhe-roi-total-anual">0,00%</span></p>
+                <p><strong>Payback:</strong> <span id="airbnb-detalhe-payback">0,00 anos</span></p>
+                
+                <h4>Receitas e Custos Anuais</h4>
+                <div class="chart-container">
+                    <canvas id="airbnb-receita-chart"></canvas>
+                </div>
+                
+                <h4>Fluxo de Caixa Acumulado</h4>
+                <div class="chart-container">
+                    <canvas id="airbnb-fluxo-chart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer no-print">
+            <p>Simulador de Projeção de Ganhos - Empreendimento Vergê | Desenvolvido com base em dados do mercado imobiliário de Florianópolis e análises de investimento.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Dados das unidades
+        const unidades = {
+            "201-B1": {
+                unidade: "201 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Sul",
+                valor_total: 1395785.00,
+                ato: 139578.32,
+                parcela_mensal: 4984.95,
+                parcela_semestral: 19939.79,
+                financiamento: 907260.25
+            },
+            "202-B1": {
+                unidade: "202 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 943440.00,
+                ato: 94343.97,
+                parcela_mensal: 3369.43,
+                parcela_semestral: 13477.71,
+                financiamento: 613236.00
+            },
+            "204-B1": {
+                unidade: "204 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.11,
+                posicao: "Oeste",
+                valor_total: 934872.00,
+                ato: 93487.17,
+                parcela_mensal: 3338.83,
+                parcela_semestral: 13355.31,
+                financiamento: 607666.80
+            },
+            "205-B1": {
+                unidade: "205 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 964405.00,
+                ato: 96440.68,
+                parcela_mensal: 3444.30,
+                parcela_semestral: 13777.21,
+                financiamento: 626863.25
+            },
+            "206-B1": {
+                unidade: "206 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Norte",
+                valor_total: 1484878.00,
+                ato: 148487.64,
+                parcela_mensal: 5303.14,
+                parcela_semestral: 21212.54,
+                financiamento: 965170.70
+            },
+            "209-B1": {
+                unidade: "209 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 41.40,
+                posicao: "Leste",
+                valor_total: 599975.00,
+                ato: 59997.42,
+                parcela_mensal: 2142.77,
+                parcela_semestral: 8571.07,
+                financiamento: 389983.75
+            },
+            "210-B1": {
+                unidade: "210 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 40.54,
+                posicao: "Leste",
+                valor_total: 499961.00,
+                ato: 49995.89,
+                parcela_mensal: 1785.58,
+                parcela_semestral: 7142.30,
+                financiamento: 324974.65
+            },
+            "211-B1": {
+                unidade: "211 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 72.68,
+                posicao: "Leste",
+                valor_total: 1053290.00,
+                ato: 105329.00,
+                parcela_mensal: 3761.75,
+                parcela_semestral: 15047.00,
+                financiamento: 684638.50
+            },
+            "301-B1": {
+                unidade: "301 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Sul",
+                valor_total: 1425483.00,
+                ato: 142548.35,
+                parcela_mensal: 5091.01,
+                parcela_semestral: 20364.04,
+                financiamento: 926563.95
+            },
+            "302-B1": {
+                unidade: "302 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 962309.00,
+                ato: 96230.90,
+                parcela_mensal: 3436.82,
+                parcela_semestral: 13747.27,
+                financiamento: 625500.85
+            },
+            "304-B1": {
+                unidade: "304 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.11,
+                posicao: "Oeste",
+                valor_total: 953569.00,
+                ato: 95356.90,
+                parcela_mensal: 3405.60,
+                parcela_semestral: 13622.41,
+                financiamento: 619819.85
+            },
+            "305-B1": {
+                unidade: "305 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 983693.00,
+                ato: 98369.30,
+                parcela_mensal: 3513.19,
+                parcela_semestral: 14052.76,
+                financiamento: 639400.45
+            },
+            "306-B1": {
+                unidade: "306 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Norte",
+                valor_total: 1514576.00,
+                ato: 151457.60,
+                parcela_mensal: 5409.20,
+                parcela_semestral: 21636.80,
+                financiamento: 984474.40
+            },
+            "309-B1": {
+                unidade: "309 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 41.40,
+                posicao: "Leste",
+                valor_total: 611975.00,
+                ato: 61197.50,
+                parcela_mensal: 2185.63,
+                parcela_semestral: 8742.50,
+                financiamento: 397784.00
+            },
+            "310-B1": {
+                unidade: "310 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 40.54,
+                posicao: "Leste",
+                valor_total: 509960.00,
+                ato: 50996.00,
+                parcela_mensal: 1821.29,
+                parcela_semestral: 7285.14,
+                financiamento: 331474.00
+            },
+            "311-B1": {
+                unidade: "311 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 72.68,
+                posicao: "Leste",
+                valor_total: 1074356.00,
+                ato: 107435.60,
+                parcela_mensal: 3836.99,
+                parcela_semestral: 15347.94,
+                financiamento: 698331.40
+            },
+            "401-B1": {
+                unidade: "401 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Sul",
+                valor_total: 1484878.00,
+                ato: 148487.64,
+                parcela_mensal: 5303.14,
+                parcela_semestral: 21212.54,
+                financiamento: 965170.70
+            },
+            "402-B1": {
+                unidade: "402 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 981555.00,
+                ato: 98155.50,
+                parcela_mensal: 3505.55,
+                parcela_semestral: 14022.21,
+                financiamento: 638010.75
+            },
+            "404-B1": {
+                unidade: "404 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.11,
+                posicao: "Oeste",
+                valor_total: 972640.00,
+                ato: 97264.00,
+                parcela_mensal: 3473.71,
+                parcela_semestral: 13894.86,
+                financiamento: 632216.00
+            },
+            "405-B1": {
+                unidade: "405 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 1003367.00,
+                ato: 100336.70,
+                parcela_mensal: 3583.45,
+                parcela_semestral: 14333.81,
+                financiamento: 652188.55
+            },
+            "406-B1": {
+                unidade: "406 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Norte",
+                valor_total: 1544867.00,
+                ato: 154486.70,
+                parcela_mensal: 5517.38,
+                parcela_semestral: 22069.53,
+                financiamento: 1004163.55
+            },
+            "409-B1": {
+                unidade: "409 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 41.40,
+                posicao: "Leste",
+                valor_total: 624214.00,
+                ato: 62421.40,
+                parcela_mensal: 2229.34,
+                parcela_semestral: 8917.34,
+                financiamento: 405739.10
+            },
+            "410-B1": {
+                unidade: "410 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 40.54,
+                posicao: "Leste",
+                valor_total: 520159.00,
+                ato: 52015.90,
+                parcela_mensal: 1857.71,
+                parcela_semestral: 7430.84,
+                financiamento: 338103.35
+            },
+            "411-B1": {
+                unidade: "411 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 72.68,
+                posicao: "Leste",
+                valor_total: 1095843.00,
+                ato: 109584.30,
+                parcela_mensal: 3913.73,
+                parcela_semestral: 15654.90,
+                financiamento: 712297.95
+            },
+            "501-B1": {
+                unidade: "501 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Sul",
+                valor_total: 1514576.00,
+                ato: 151457.60,
+                parcela_mensal: 5409.20,
+                parcela_semestral: 21636.80,
+                financiamento: 984474.40
+            },
+            "502-B1": {
+                unidade: "502 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 1001186.00,
+                ato: 100118.60,
+                parcela_mensal: 3575.66,
+                parcela_semestral: 14302.66,
+                financiamento: 650770.90
+            },
+            "504-B1": {
+                unidade: "504 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.11,
+                posicao: "Oeste",
+                valor_total: 992093.00,
+                ato: 99209.30,
+                parcela_mensal: 3543.19,
+                parcela_semestral: 14172.76,
+                financiamento: 644860.45
+            },
+            "505-B1": {
+                unidade: "505 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 1023434.00,
+                ato: 102343.40,
+                parcela_mensal: 3655.12,
+                parcela_semestral: 14620.49,
+                financiamento: 665232.10
+            },
+            "506-B1": {
+                unidade: "506 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Norte",
+                valor_total: 1575764.00,
+                ato: 157576.40,
+                parcela_mensal: 5627.73,
+                parcela_semestral: 22510.91,
+                financiamento: 1024246.60
+            },
+            "509-B1": {
+                unidade: "509 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 41.40,
+                posicao: "Leste",
+                valor_total: 636698.00,
+                ato: 63669.80,
+                parcela_mensal: 2273.92,
+                parcela_semestral: 9095.69,
+                financiamento: 413853.70
+            },
+            "510-B1": {
+                unidade: "510 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "1D",
+                area_privativa: 40.54,
+                posicao: "Leste",
+                valor_total: 530562.00,
+                ato: 53056.20,
+                parcela_mensal: 1894.86,
+                parcela_semestral: 7579.46,
+                financiamento: 344865.30
+            },
+            "511-B1": {
+                unidade: "511 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 72.68,
+                posicao: "Leste",
+                valor_total: 1117760.00,
+                ato: 111776.00,
+                parcela_mensal: 3992.00,
+                parcela_semestral: 15968.00,
+                financiamento: 726544.00
+            },
+            "601-B1": {
+                unidade: "601 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.51,
+                posicao: "Sul",
+                valor_total: 1575764.00,
+                ato: 157576.40,
+                parcela_mensal: 5627.73,
+                parcela_semestral: 22510.91,
+                financiamento: 1024246.60,
+                descricao: "6º pavimento - Cobertura"
+            },
+            "602-B1": {
+                unidade: "602 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 100.71,
+                posicao: "Oeste",
+                valor_total: 1218173.00,
+                ato: 121817.22,
+                parcela_mensal: 4350.62,
+                parcela_semestral: 17402.47,
+                financiamento: 791812.45,
+                descricao: "6º pavimento - Cobertura"
+            },
+            "603-B1": {
+                unidade: "603 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 120.85,
+                posicao: "Oeste",
+                valor_total: 1345748.00,
+                ato: 134574.80,
+                parcela_mensal: 4806.24,
+                parcela_semestral: 19224.97,
+                financiamento: 874736.20,
+                descricao: "6º pavimento - Cobertura"
+            },
+            "604-B1": {
+                unidade: "604 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.11,
+                posicao: "Oeste",
+                valor_total: 1011935.00,
+                ato: 101193.50,
+                parcela_mensal: 3613.34,
+                parcela_semestral: 14456.21,
+                financiamento: 657757.75,
+                descricao: "6º pavimento - Cobertura"
+            },
+            "605-B1": {
+                unidade: "605 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "2DS",
+                area_privativa: 73.78,
+                posicao: "Oeste",
+                valor_total: 1043903.00,
+                ato: 104390.30,
+                parcela_mensal: 3728.22,
+                parcela_semestral: 14912.90,
+                financiamento: 678536.95,
+                descricao: "6º pavimento - Cobertura"
+            },
+            "606-B1": {
+                unidade: "606 - B1",
+                bloco: "BLOCO 01",
+                tipologia: "3DS",
+                area_privativa: 104.77,
+                posicao: "Norte",
+                valor_total: 1607279.00,
+                ato: 160727.90,
+                parcela_mensal: 5740.28,
+                parcela_semestral: 22961.13,
+                financiamento: 1044731.35,
+                descricao: "6º pavimento - Cobertura"
+            }
+        };
+        
+        // Parâmetros de mercado
+        const parametros = {
+            taxa_valorizacao_anual: 0.10,  // 10% ao ano (média de Florianópolis)
+            taxa_valorizacao_otimista: 0.15,  // 15% ao ano (regiões mais valorizadas)
+            taxa_valorizacao_pessimista: 0.07,  // 7% ao ano (cenário conservador)
+            
+            // Parâmetros para Airbnb
+            diaria_media: 375,  // R$ 375 (média de Florianópolis)
+            taxa_ocupacao_alta: 0.80,  // 80% de ocupação em alta temporada
+            taxa_ocupacao_baixa: 0.40,  // 40% de ocupação em baixa temporada
+            meses_alta_temporada: 4,  // Dezembro a Março
+            meses_baixa_temporada: 8,  // Abril a Novembro
+            
+            // Custos operacionais
+            taxa_iptu: 0.01,  // 1% do valor do imóvel ao ano
+            taxa_condominio: 0.003,  // 0,3% do valor do imóvel ao mês
+            taxa_manutencao: 0.005,  // 0,5% do valor do imóvel ao ano
+            taxa_limpeza_airbnb: 150,  // R$ 150 por limpeza
+            taxa_administracao_airbnb: 0.20,  // 20% da receita bruta
+            
+            // Custos de transação
+            custo_escritura: 0.03,  // 3% do valor do imóvel
+            taxa_corretagem_compra: 0.02,  // 2% do valor do imóvel
+            taxa_corretagem_venda: 0.05  // 5% do valor do imóvel
+        };
+        
+        // Variáveis para os gráficos
+        let roiChart, lucroChart, revendaFluxoChart, airbnbReceitaChart, airbnbFluxoChart;
+        
+        // Função para formatar valores monetários
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+        
+        // Função para formatar percentuais
+        function formatarPercentual(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'percent', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(valor / 100);
+        }
+        
+        // Função para atualizar o valor exibido dos anos
+        function updateAnosValue(val) {
+            document.getElementById('anos-value').textContent = val + ' anos';
+        }
+        
+        // Função para abrir abas
+        function openTab(evt, tabName) {
+            // Esconder todos os conteúdos de abas
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Remover a classe "active" de todas as abas
+            var tabs = document.getElementsByClassName("tab");
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove("active");
+            }
+            
+            // Mostrar a aba atual e adicionar a classe "active" ao botão que abriu a aba
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+        
+        // Função para simular compra e revenda
+        function simularCompraRevenda(unidadeId, anosInvestimento, cenario) {
+            const unidade = unidades[unidadeId];
+            
+            // Definir taxa de valorização com base no cenário
+            let taxaValorizacao;
+            if (cenario === 'pessimista') {
+                taxaValorizacao = parametros.taxa_valorizacao_pessimista;
+            } else if (cenario === 'otimista') {
+                taxaValorizacao = parametros.taxa_valorizacao_otimista;
+            } else {  // médio
+                taxaValorizacao = parametros.taxa_valorizacao_anual;
+            }
+            
+            // Calcular valor futuro do imóvel
+            const valorFuturo = unidade.valor_total * Math.pow(1 + taxaValorizacao, anosInvestimento);
+            
+            // Calcular custos de aquisição
+            const custoEscritura = unidade.valor_total * parametros.custo_escritura;
+            const custoCorretagemCompra = unidade.valor_total * parametros.taxa_corretagem_compra;
+            
+            // Calcular custos de venda
+            const custoCorretagemVenda = valorFuturo * parametros.taxa_corretagem_venda;
+            
+            // Calcular investimento total
+            const investimentoTotal = unidade.ato + custoEscritura + custoCorretagemCompra + 
+                                     (unidade.parcela_mensal * 42) + (unidade.parcela_semestral * 7) + 
+                                     unidade.financiamento;
+            
+            // Calcular lucro bruto
+            const lucroBruto = valorFuturo - investimentoTotal - custoCorretagemVenda;
+            
+            // Calcular ROI
+            const roi = (lucroBruto / investimentoTotal) * 100;
+            
+            // Calcular ROI anualizado
+            const roiAnual = (Math.pow(1 + roi/100, 1/anosInvestimento) - 1) * 100;
+            
+            // Calcular fluxo de caixa anual
+            const fluxoCaixaAnual = [];
+            
+            // Ano 0 (aquisição)
+            fluxoCaixaAnual.push(-(unidade.ato + custoEscritura + custoCorretagemCompra));
+            
+            // Anos 1 a 3 (parcelas)
+            for (let i = 1; i <= 3; i++) {
+                if (i <= 3) {
+                    // Parcelas mensais e semestrais
+                    const parcelasMensaisAno = i === 3 ? 6 : 12; // No ano 3, apenas 6 meses (até 42 meses)
+                    const parcelasSemestraisAno = i <= 3 ? 2 : 0; // 2 parcelas semestrais por ano nos primeiros 3 anos
+                    
+                    const valorParcelasMensais = unidade.parcela_mensal * parcelasMensaisAno;
+                    const valorParcelasSemestrais = unidade.parcela_semestral * parcelasSemestraisAno;
+                    
+                    fluxoCaixaAnual.push(-(valorParcelasMensais + valorParcelasSemestrais));
+                } else {
+                    fluxoCaixaAnual.push(0);
+                }
+            }
+            
+            // Ano 3 (financiamento)
+            fluxoCaixaAnual[3] -= unidade.financiamento;
+            
+            // Anos 4 e 5 (sem pagamentos)
+            for (let i = 4; i < anosInvestimento; i++) {
+                fluxoCaixaAnual.push(0);
+            }
+            
+            // Último ano (venda)
+            fluxoCaixaAnual.push(valorFuturo - custoCorretagemVenda);
+            
+            return {
+                unidade: unidade.unidade,
+                bloco: unidade.bloco,
+                tipologia: unidade.tipologia,
+                area_privativa: unidade.area_privativa,
+                posicao: unidade.posicao,
+                valor_total: unidade.valor_total,
+                valor_m2: unidade.valor_total / unidade.area_privativa,
+                valor_entrada: unidade.ato,
+                valor_parcela_mensal: unidade.parcela_mensal,
+                valor_parcela_semestral: unidade.parcela_semestral,
+                valor_financiamento: unidade.financiamento,
+                cenario: cenario,
+                taxa_valorizacao_anual: taxaValorizacao * 100,
+                anos_investimento: anosInvestimento,
+                valor_futuro: valorFuturo,
+                investimento_total: investimentoTotal,
+                lucro_bruto: lucroBruto,
+                roi: roi,
+                roi_anual: roiAnual,
+                fluxo_caixa_anual: fluxoCaixaAnual
+            };
+        }
+        
+        // Função para simular compra e aluguel via Airbnb
+        function simularCompraAirbnb(unidadeId, anosInvestimento, cenarioValorizacao, cenarioOcupacao) {
+            const unidade = unidades[unidadeId];
+            
+            // Definir taxa de valorização com base no cenário
+            let taxaValorizacao;
+            if (cenarioValorizacao === 'pessimista') {
+                taxaValorizacao = parametros.taxa_valorizacao_pessimista;
+            } else if (cenarioValorizacao === 'otimista') {
+                taxaValorizacao = parametros.taxa_valorizacao_otimista;
+            } else {  // médio
+                taxaValorizacao = parametros.taxa_valorizacao_anual;
+            }
+            
+            // Ajustar diária média com base na tipologia e área
+            let fatorTipologia = 1.0;
+            if (unidade.tipologia.includes('3D')) {  // 3 dormitórios
+                fatorTipologia = 1.5;
+            } else if (unidade.tipologia.includes('2D')) {  // 2 dormitórios
+                fatorTipologia = 1.2;
+            }
+            
+            // Fator de área (normalizado para 100m²)
+            const fatorArea = unidade.area_privativa / 100.0;
+            
+            // Diária ajustada
+            const diariaAjustada = parametros.diaria_media * fatorTipologia * fatorArea;
+            
+            // Ajustar taxa de ocupação com base no cenário
+            let taxaOcupacaoAlta, taxaOcupacaoBaixa;
+            if (cenarioOcupacao === 'pessimista') {
+                taxaOcupacaoAlta = parametros.taxa_ocupacao_alta * 0.8;  // 20% menor
+                taxaOcupacaoBaixa = parametros.taxa_ocupacao_baixa * 0.8;  // 20% menor
+            } else if (cenarioOcupacao === 'otimista') {
+                taxaOcupacaoAlta = Math.min(parametros.taxa_ocupacao_alta * 1.2, 0.95);  // 20% maior, máximo 95%
+                taxaOcupacaoBaixa = Math.min(parametros.taxa_ocupacao_baixa * 1.2, 0.7);  // 20% maior, máximo 70%
+            } else {  // médio
+                taxaOcupacaoAlta = parametros.taxa_ocupacao_alta;
+                taxaOcupacaoBaixa = parametros.taxa_ocupacao_baixa;
+            }
+            
+            // Calcular receita anual
+            const diasAlta = parametros.meses_alta_temporada * 30;
+            const diasBaixa = parametros.meses_baixa_temporada * 30;
+            
+            const receitaAlta = diasAlta * taxaOcupacaoAlta * diariaAjustada;
+            const receitaBaixa = diasBaixa * taxaOcupacaoBaixa * diariaAjustada;
+            const receitaAnual = receitaAlta + receitaBaixa;
+            
+            // Calcular custos operacionais anuais
+            const custoIptu = unidade.valor_total * parametros.taxa_iptu;
+            const custoCondominio = unidade.valor_total * parametros.taxa_condominio * 12;  // mensal para anual
+            const custoManutencao = unidade.valor_total * parametros.taxa_manutencao;
+            
+            // Limpezas (uma por check-out)
+            const numLimpezasAlta = diasAlta * taxaOcupacaoAlta / 3;  // média de 3 dias por estadia
+            const numLimpezasBaixa = diasBaixa * taxaOcupacaoBaixa / 4;  // média de 4 dias por estadia
+            const custoLimpeza = (numLimpezasAlta + numLimpezasBaixa) * parametros.taxa_limpeza_airbnb;
+            
+            // Taxa de administração
+            const custoAdministracao = receitaAnual * parametros.taxa_administracao_airbnb;
+            
+            // Total de custos operacionais
+            const custosOperacionais = custoIptu + custoCondominio + custoManutencao + custoLimpeza + custoAdministracao;
+            
+            // Lucro operacional anual
+            const lucroOperacional = receitaAnual - custosOperacionais;
+            
+            // Calcular custos de aquisição
+            const custoEscritura = unidade.valor_total * parametros.custo_escritura;
+            const custoCorretagemCompra = unidade.valor_total * parametros.taxa_corretagem_compra;
+            
+            // Calcular investimento total
+            const investimentoTotal = unidade.ato + custoEscritura + custoCorretagemCompra + 
+                                     (unidade.parcela_mensal * 42) + (unidade.parcela_semestral * 7) + 
+                                     unidade.financiamento;
+            
+            // Calcular lucro operacional total
+            const lucroOperacionalTotal = lucroOperacional * anosInvestimento;
+            
+            // Calcular ROI operacional (sem considerar valorização do imóvel)
+            const roiOperacional = (lucroOperacionalTotal / investimentoTotal) * 100;
+            
+            // Calcular ROI operacional anualizado
+            const roiOperacionalAnual = roiOperacional / anosInvestimento;
+            
+            // Valor futuro do imóvel
+            const valorFuturo = unidade.valor_total * Math.pow(1 + taxaValorizacao, anosInvestimento);
+            
+            // Calcular ROI total (considerando valorização do imóvel)
+            const roiTotal = ((lucroOperacionalTotal + (valorFuturo - unidade.valor_total)) / investimentoTotal) * 100;
+            
+            // Calcular ROI total anualizado
+            const roiTotalAnual = (Math.pow(1 + roiTotal/100, 1/anosInvestimento) - 1) * 100;
+            
+            // Calcular fluxo de caixa anual
+            const fluxoCaixaAnual = [];
+            
+            // Ano 0 (aquisição)
+            fluxoCaixaAnual.push(-(unidade.ato + custoEscritura + custoCorretagemCompra));
+            
+            // Anos 1 a 3 (parcelas + receitas - custos)
+            for (let i = 1; i <= anosInvestimento; i++) {
+                let fluxoAno = 0;
+                
+                // Receitas e custos operacionais
+                if (i >= 1) {
+                    fluxoAno += lucroOperacional;
+                }
+                
+                // Parcelas (apenas nos primeiros 3 anos)
+                if (i <= 3) {
+                    // Parcelas mensais e semestrais
+                    const parcelasMensaisAno = i === 3 ? 6 : 12; // No ano 3, apenas 6 meses (até 42 meses)
+                    const parcelasSemestraisAno = i <= 3 ? 2 : 0; // 2 parcelas semestrais por ano nos primeiros 3 anos
+                    
+                    const valorParcelasMensais = unidade.parcela_mensal * parcelasMensaisAno;
+                    const valorParcelasSemestrais = unidade.parcela_semestral * parcelasSemestraisAno;
+                    
+                    fluxoAno -= (valorParcelasMensais + valorParcelasSemestrais);
+                }
+                
+                // Financiamento no ano 3
+                if (i === 3) {
+                    fluxoAno -= unidade.financiamento;
+                }
+                
+                fluxoCaixaAnual.push(fluxoAno);
+            }
+            
+            // Calcular fluxo acumulado para payback
+            let fluxoAcumulado = fluxoCaixaAnual[0];
+            let payback = anosInvestimento;
+            
+            for (let i = 1; i <= anosInvestimento; i++) {
+                fluxoAcumulado += fluxoCaixaAnual[i];
+                
+                if (fluxoAcumulado >= 0 && payback === anosInvestimento) {
+                    // Interpolação linear para estimar o payback preciso
+                    if (i > 0) {
+                        const fluxoAnterior = fluxoAcumulado - fluxoCaixaAnual[i];
+                        const anoAnterior = i - 1;
+                        
+                        // Fração do ano para atingir payback
+                        if (fluxoCaixaAnual[i] !== 0) {  // evitar divisão por zero
+                            const fracao = -fluxoAnterior / fluxoCaixaAnual[i];
+                            payback = anoAnterior + fracao;
+                        } else {
+                            payback = i;
+                        }
+                    } else {
+                        payback = i;
+                    }
+                }
+            }
+            
+            // Calcular receitas e custos anuais para o gráfico
+            const receitasAnuais = [];
+            const custosAnuais = [];
+            
+            for (let i = 1; i <= anosInvestimento; i++) {
+                // Atualizar diária (aumento de 5% ao ano além da valorização)
+                const diariaAno = diariaAjustada * Math.pow(1.05, i - 1);
+                
+                // Recalcular receitas
+                const receitaAltaAno = diasAlta * taxaOcupacaoAlta * diariaAno;
+                const receitaBaixaAno = diasBaixa * taxaOcupacaoBaixa * diariaAno;
+                const receitaAnualAno = receitaAltaAno + receitaBaixaAno;
+                
+                // Valor do imóvel atualizado para o ano
+                const valorImovelAno = unidade.valor_total * Math.pow(1 + taxaValorizacao, i - 1);
+                
+                // Atualizar custos baseados no valor do imóvel
+                const custoIptuAno = valorImovelAno * parametros.taxa_iptu;
+                const custoCondominioAno = valorImovelAno * parametros.taxa_condominio * 12;
+                const custoManutencaoAno = valorImovelAno * parametros.taxa_manutencao;
+                
+                // Recalcular custos de limpeza e administração
+                const custoLimpezaAno = (numLimpezasAlta + numLimpezasBaixa) * parametros.taxa_limpeza_airbnb * Math.pow(1.05, i - 1);
+                const custoAdministracaoAno = receitaAnualAno * parametros.taxa_administracao_airbnb;
+                
+                // Total de custos operacionais do ano
+                const custosOperacionaisAno = custoIptuAno + custoCondominioAno + custoManutencaoAno + custoLimpezaAno + custoAdministracaoAno;
+                
+                receitasAnuais.push(receitaAnualAno);
+                custosAnuais.push(custosOperacionaisAno);
+            }
+            
+            return {
+                unidade: unidade.unidade,
+                bloco: unidade.bloco,
+                tipologia: unidade.tipologia,
+                area_privativa: unidade.area_privativa,
+                posicao: unidade.posicao,
+                valor_total: unidade.valor_total,
+                valor_m2: unidade.valor_total / unidade.area_privativa,
+                valor_entrada: unidade.ato,
+                valor_parcela_mensal: unidade.parcela_mensal,
+                valor_parcela_semestral: unidade.parcela_semestral,
+                valor_financiamento: unidade.financiamento,
+                cenario_valorizacao: cenarioValorizacao,
+                taxa_valorizacao_anual: taxaValorizacao * 100,
+                cenario_ocupacao: cenarioOcupacao,
+                taxa_ocupacao_alta: taxaOcupacaoAlta * 100,
+                taxa_ocupacao_baixa: taxaOcupacaoBaixa * 100,
+                diaria_media: diariaAjustada,
+                receita_anual: receitaAnual,
+                custos_operacionais: custosOperacionais,
+                lucro_operacional: lucroOperacional,
+                anos_investimento: anosInvestimento,
+                valor_futuro: valorFuturo,
+                investimento_total: investimentoTotal,
+                lucro_operacional_total: lucroOperacionalTotal,
+                roi_operacional: roiOperacional,
+                roi_operacional_anual: roiOperacionalAnual,
+                roi_total: roiTotal,
+                roi_total_anual: roiTotalAnual,
+                payback: payback,
+                fluxo_caixa_anual: fluxoCaixaAnual,
+                receitas_anuais: receitasAnuais,
+                custos_anuais: custosAnuais
+            };
+        }
+        
+        // Função para criar o gráfico de ROI
+        function criarGraficoROI(revendaROI, airbnbROIOperacional, airbnbROITotal) {
+            const ctx = document.getElementById('roi-chart').getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (roiChart) {
+                roiChart.destroy();
+            }
+            
+            roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Revenda', 'Airbnb (Operacional)', 'Airbnb (Total)'],
+                    datasets: [{
+                        label: 'ROI Anual (%)',
+                        data: [revendaROI, airbnbROIOperacional, airbnbROITotal],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(75, 192, 192, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'ROI Anual Comparativo (%)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.toFixed(2) + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ROI Anual (%)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Função para criar o gráfico de lucro
+        function criarGraficoLucro(revendaLucro, airbnbLucro, anos) {
+            const ctx = document.getElementById('lucro-chart').getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (lucroChart) {
+                lucroChart.destroy();
+            }
+            
+            lucroChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Revenda', 'Airbnb'],
+                    datasets: [{
+                        label: 'Lucro Total',
+                        data: [revendaLucro, airbnbLucro],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Lucro Total em ${anos} Anos (R$)`,
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatarMoeda(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Lucro Total (R$)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return 'R$ ' + (value / 1000).toFixed(0) + 'K';
+                                    } else {
+                                        return 'R$ ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Função para criar o gráfico de fluxo de caixa da revenda
+        function criarGraficoFluxoRevenda(fluxoCaixa, anos) {
+            const ctx = document.getElementById('revenda-fluxo-chart').getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (revendaFluxoChart) {
+                revendaFluxoChart.destroy();
+            }
+            
+            // Criar labels para os anos
+            const labels = [];
+            for (let i = 0; i <= anos; i++) {
+                labels.push('Ano ' + i);
+            }
+            
+            // Criar cores com base no valor (positivo/negativo)
+            const backgroundColors = fluxoCaixa.map(valor => 
+                valor < 0 ? 'rgba(255, 99, 132, 0.7)' : 'rgba(75, 192, 192, 0.7)'
+            );
+            
+            const borderColors = fluxoCaixa.map(valor => 
+                valor < 0 ? 'rgba(255, 99, 132, 1)' : 'rgba(75, 192, 192, 1)'
+            );
+            
+            revendaFluxoChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Fluxo de Caixa',
+                        data: fluxoCaixa,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Fluxo de Caixa Anual - Revenda',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return formatarMoeda(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Valor (R$)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (Math.abs(value) >= 1000000) {
+                                        return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (Math.abs(value) >= 1000) {
+                                        return 'R$ ' + (value / 1000).toFixed(0) + 'K';
+                                    } else {
+                                        return 'R$ ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Função para criar o gráfico de receitas e custos do Airbnb
+        function criarGraficoReceitaAirbnb(receitas, custos, anos) {
+            const ctx = document.getElementById('airbnb-receita-chart').getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (airbnbReceitaChart) {
+                airbnbReceitaChart.destroy();
+            }
+            
+            // Criar labels para os anos
+            const labels = [];
+            for (let i = 1; i <= anos; i++) {
+                labels.push('Ano ' + i);
+            }
+            
+            // Calcular lucros
+            const lucros = receitas.map((receita, i) => receita - custos[i]);
+            
+            airbnbReceitaChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Custos Operacionais',
+                            data: custos,
+                            backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Lucro Operacional',
+                            data: lucros,
+                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Receitas e Custos Anuais - Airbnb',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + formatarMoeda(context.raw);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Valor (R$)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (value >= 1000000) {
+                                        return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (value >= 1000) {
+                                        return 'R$ ' + (value / 1000).toFixed(0) + 'K';
+                                    } else {
+                                        return 'R$ ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Função para criar o gráfico de fluxo acumulado do Airbnb
+        function criarGraficoFluxoAirbnb(fluxoCaixa, payback, anos) {
+            const ctx = document.getElementById('airbnb-fluxo-chart').getContext('2d');
+            
+            // Destruir gráfico anterior se existir
+            if (airbnbFluxoChart) {
+                airbnbFluxoChart.destroy();
+            }
+            
+            // Criar labels para os anos
+            const labels = [];
+            for (let i = 0; i <= anos; i++) {
+                labels.push('Ano ' + i);
+            }
+            
+            // Calcular fluxo acumulado
+            const fluxoAcumulado = [];
+            let acumulado = 0;
+            
+            for (let i = 0; i <= anos; i++) {
+                acumulado += fluxoCaixa[i];
+                fluxoAcumulado.push(acumulado);
+            }
+            
+            // Encontrar o ponto de payback para destacar
+            const paybackIndex = Math.floor(payback);
+            const paybackData = fluxoAcumulado.map((valor, i) => {
+                if (i === paybackIndex) {
+                    return valor;
+                } else {
+                    return null;
+                }
+            });
+            
+            airbnbFluxoChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Fluxo Acumulado',
+                            data: fluxoAcumulado,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'Payback',
+                            data: paybackData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 0,
+                            pointRadius: 8,
+                            pointHoverRadius: 10
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Fluxo de Caixa Acumulado - Airbnb',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.dataset.label === 'Payback') {
+                                        return 'Payback: ' + payback.toFixed(1) + ' anos';
+                                    } else {
+                                        return formatarMoeda(context.raw);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Valor Acumulado (R$)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    if (Math.abs(value) >= 1000000) {
+                                        return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+                                    } else if (Math.abs(value) >= 1000) {
+                                        return 'R$ ' + (value / 1000).toFixed(0) + 'K';
+                                    } else {
+                                        return 'R$ ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Função para gerar relatório em PDF
+        function gerarRelatorio() {
+            // Mostrar todas as abas para impressão
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'block';
+            });
+            
+            // Preencher informações para impressão
+            const unidadeSelect = document.getElementById('unidade');
+            const unidadeTexto = unidadeSelect.options[unidadeSelect.selectedIndex].text;
+            document.getElementById('print-unidade').textContent = unidadeTexto;
+            
+            const cenarioValorizacaoSelect = document.getElementById('cenario-valorizacao');
+            const cenarioValorizacaoTexto = cenarioValorizacaoSelect.options[cenarioValorizacaoSelect.selectedIndex].text;
+            document.getElementById('print-cenario-valorizacao').textContent = cenarioValorizacaoTexto;
+            
+            const cenarioOcupacaoSelect = document.getElementById('cenario-ocupacao');
+            const cenarioOcupacaoTexto = cenarioOcupacaoSelect.options[cenarioOcupacaoSelect.selectedIndex].text;
+            document.getElementById('print-cenario-ocupacao').textContent = cenarioOcupacaoTexto;
+            
+            document.getElementById('print-anos').textContent = document.getElementById('anos-value').textContent;
+            
+            // Imprimir ou salvar como PDF
+            window.print();
+            
+            // Restaurar visualização normal
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById('comparativo').style.display = 'block';
+        }
+        
+        // Função principal para simular
+        function simular() {
+            // Obter valores dos inputs
+            const unidadeId = document.getElementById('unidade').value;
+            const anosInvestimento = parseInt(document.getElementById('anos').value);
+            const cenarioValorizacao = document.getElementById('cenario-valorizacao').value;
+            const cenarioOcupacao = document.getElementById('cenario-ocupacao').value;
+            
+            // Simular compra e revenda
+            const resultadoRevenda = simularCompraRevenda(unidadeId, anosInvestimento, cenarioValorizacao);
+            
+            // Simular compra e aluguel via Airbnb
+            const resultadoAirbnb = simularCompraAirbnb(unidadeId, anosInvestimento, cenarioValorizacao, cenarioOcupacao);
+            
+            // Exibir resultados
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('btn-relatorio').style.display = 'inline-block';
+            
+            // Preencher valores na aba Comparativo
+            document.getElementById('revenda-valor-futuro').textContent = formatarMoeda(resultadoRevenda.valor_futuro);
+            document.getElementById('revenda-lucro-bruto').textContent = formatarMoeda(resultadoRevenda.lucro_bruto);
+            document.getElementById('revenda-roi-total').textContent = resultadoRevenda.roi.toFixed(2) + '%';
+            document.getElementById('revenda-roi-anual').textContent = resultadoRevenda.roi_anual.toFixed(2) + '% ao ano';
+            
+            document.getElementById('airbnb-receita-anual').textContent = formatarMoeda(resultadoAirbnb.receita_anual);
+            document.getElementById('airbnb-lucro-operacional').textContent = formatarMoeda(resultadoAirbnb.lucro_operacional);
+            document.getElementById('airbnb-roi-operacional').textContent = resultadoAirbnb.roi_operacional_anual.toFixed(2) + '% ao ano';
+            document.getElementById('airbnb-payback').textContent = resultadoAirbnb.payback.toFixed(1) + ' anos';
+            
+            // Preencher tabela comparativa
+            document.getElementById('comp-valor-total-revenda').textContent = formatarMoeda(resultadoRevenda.valor_total);
+            document.getElementById('comp-valor-total-airbnb').textContent = formatarMoeda(resultadoAirbnb.valor_total);
+            
+            document.getElementById('comp-valor-futuro-revenda').textContent = formatarMoeda(resultadoRevenda.valor_futuro);
+            document.getElementById('comp-valor-futuro-airbnb').textContent = formatarMoeda(resultadoAirbnb.valor_futuro);
+            
+            document.getElementById('comp-investimento-revenda').textContent = formatarMoeda(resultadoRevenda.investimento_total);
+            document.getElementById('comp-investimento-airbnb').textContent = formatarMoeda(resultadoAirbnb.investimento_total);
+            
+            document.getElementById('comp-lucro-revenda').textContent = formatarMoeda(resultadoRevenda.lucro_bruto);
+            document.getElementById('comp-lucro-airbnb').textContent = formatarMoeda(resultadoAirbnb.lucro_operacional_total);
+            
+            document.getElementById('comp-roi-total-revenda').textContent = resultadoRevenda.roi.toFixed(2) + '%';
+            document.getElementById('comp-roi-total-airbnb').textContent = resultadoAirbnb.roi_total.toFixed(2) + '%';
+            
+            document.getElementById('comp-roi-anual-revenda').textContent = resultadoRevenda.roi_anual.toFixed(2) + '%';
+            document.getElementById('comp-roi-anual-airbnb').textContent = resultadoAirbnb.roi_total_anual.toFixed(2) + '%';
+            
+            document.getElementById('comp-payback-airbnb').textContent = resultadoAirbnb.payback.toFixed(1);
+            
+            // Preencher valores na aba Revenda
+            document.getElementById('revenda-unidade').textContent = resultadoRevenda.unidade;
+            document.getElementById('revenda-cenario').textContent = cenarioValorizacao;
+            document.getElementById('revenda-taxa-valorizacao').textContent = resultadoRevenda.taxa_valorizacao_anual.toFixed(2) + '%';
+            document.getElementById('revenda-anos').textContent = resultadoRevenda.anos_investimento;
+            
+            document.getElementById('revenda-valor-total').textContent = formatarMoeda(resultadoRevenda.valor_total);
+            document.getElementById('revenda-valor-m2').textContent = formatarMoeda(resultadoRevenda.valor_m2);
+            document.getElementById('revenda-entrada').textContent = formatarMoeda(resultadoRevenda.valor_entrada);
+            document.getElementById('revenda-parcela-mensal').textContent = formatarMoeda(resultadoRevenda.valor_parcela_mensal);
+            document.getElementById('revenda-parcela-semestral').textContent = formatarMoeda(resultadoRevenda.valor_parcela_semestral);
+            document.getElementById('revenda-financiamento').textContent = formatarMoeda(resultadoRevenda.valor_financiamento);
+            
+            document.getElementById('revenda-detalhe-valor-futuro').textContent = formatarMoeda(resultadoRevenda.valor_futuro);
+            document.getElementById('revenda-investimento-total').textContent = formatarMoeda(resultadoRevenda.investimento_total);
+            document.getElementById('revenda-detalhe-lucro-bruto').textContent = formatarMoeda(resultadoRevenda.lucro_bruto);
+            document.getElementById('revenda-detalhe-roi-total').textContent = resultadoRevenda.roi.toFixed(2) + '%';
+            document.getElementById('revenda-detalhe-roi-anual').textContent = resultadoRevenda.roi_anual.toFixed(2) + '%';
+            
+            // Preencher valores na aba Airbnb
+            document.getElementById('airbnb-unidade').textContent = resultadoAirbnb.unidade;
+            document.getElementById('airbnb-cenario-valorizacao').textContent = cenarioValorizacao;
+            document.getElementById('airbnb-taxa-valorizacao').textContent = resultadoAirbnb.taxa_valorizacao_anual.toFixed(2) + '%';
+            document.getElementById('airbnb-cenario-ocupacao').textContent = cenarioOcupacao;
+            document.getElementById('airbnb-taxa-ocupacao-alta').textContent = resultadoAirbnb.taxa_ocupacao_alta.toFixed(2) + '%';
+            document.getElementById('airbnb-taxa-ocupacao-baixa').textContent = resultadoAirbnb.taxa_ocupacao_baixa.toFixed(2) + '%';
+            document.getElementById('airbnb-anos').textContent = resultadoAirbnb.anos_investimento;
+            
+            document.getElementById('airbnb-valor-total').textContent = formatarMoeda(resultadoAirbnb.valor_total);
+            document.getElementById('airbnb-valor-m2').textContent = formatarMoeda(resultadoAirbnb.valor_m2);
+            document.getElementById('airbnb-entrada').textContent = formatarMoeda(resultadoAirbnb.valor_entrada);
+            document.getElementById('airbnb-parcela-mensal').textContent = formatarMoeda(resultadoAirbnb.valor_parcela_mensal);
+            document.getElementById('airbnb-parcela-semestral').textContent = formatarMoeda(resultadoAirbnb.valor_parcela_semestral);
+            document.getElementById('airbnb-financiamento').textContent = formatarMoeda(resultadoAirbnb.valor_financiamento);
+            
+            document.getElementById('airbnb-diaria-media').textContent = formatarMoeda(resultadoAirbnb.diaria_media);
+            document.getElementById('airbnb-detalhe-receita-anual').textContent = formatarMoeda(resultadoAirbnb.receita_anual);
+            document.getElementById('airbnb-custos-operacionais').textContent = formatarMoeda(resultadoAirbnb.custos_operacionais);
+            document.getElementById('airbnb-detalhe-lucro-operacional').textContent = formatarMoeda(resultadoAirbnb.lucro_operacional);
+            document.getElementById('airbnb-detalhe-valor-futuro').textContent = formatarMoeda(resultadoAirbnb.valor_futuro);
+            
+            document.getElementById('airbnb-investimento-total').textContent = formatarMoeda(resultadoAirbnb.investimento_total);
+            document.getElementById('airbnb-lucro-operacional-total').textContent = formatarMoeda(resultadoAirbnb.lucro_operacional_total);
+            document.getElementById('airbnb-detalhe-roi-operacional').textContent = resultadoAirbnb.roi_operacional.toFixed(2) + '%';
+            document.getElementById('airbnb-detalhe-roi-operacional-anual').textContent = resultadoAirbnb.roi_operacional_anual.toFixed(2) + '%';
+            document.getElementById('airbnb-detalhe-roi-total').textContent = resultadoAirbnb.roi_total.toFixed(2) + '%';
+            document.getElementById('airbnb-detalhe-roi-total-anual').textContent = resultadoAirbnb.roi_total_anual.toFixed(2) + '%';
+            document.getElementById('airbnb-detalhe-payback').textContent = resultadoAirbnb.payback.toFixed(2) + ' anos';
+            
+            // Criar gráficos
+            criarGraficoROI(resultadoRevenda.roi_anual, resultadoAirbnb.roi_operacional_anual, resultadoAirbnb.roi_total_anual);
+            criarGraficoLucro(resultadoRevenda.lucro_bruto, resultadoAirbnb.lucro_operacional_total, anosInvestimento);
+            criarGraficoFluxoRevenda(resultadoRevenda.fluxo_caixa_anual, anosInvestimento);
+            criarGraficoReceitaAirbnb(resultadoAirbnb.receitas_anuais, resultadoAirbnb.custos_anuais, anosInvestimento);
+            criarGraficoFluxoAirbnb(resultadoAirbnb.fluxo_caixa_anual, resultadoAirbnb.payback, anosInvestimento);
+        }
+    </script>
+</body>
+</html>
